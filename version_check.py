@@ -42,6 +42,6 @@ def version_check(input_text):
                 break
         if found_value is not None:
             break
-    return found_value
+    return found_value, dict[unicode]
 
 
