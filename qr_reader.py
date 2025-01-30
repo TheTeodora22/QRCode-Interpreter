@@ -1,4 +1,5 @@
 import sys
+import os
 from PIL import Image
 import numpy as np
 from scipy.ndimage import label, find_objects
@@ -112,11 +113,14 @@ def estimate_qr_size(image_path):
     # Estimate grid size (number of modules)
     # The number of peaks corresponds to transitions between modules
     # Number of modules = number of transitions + 1
-    estimated_size = min(len(h_peaks), len(v_peaks)) + 1
+    estimated_size = min(len(h_peaks), len(v_peaks)) 
 
     print(f"Estimated QR Grid Size: {estimated_size}x{estimated_size}")
 
-    return estimated_size
+    v = round((estimated_size - 21) / 4)+1  # Estimate the nearest v
+    nearest_size = max(21, (v - 1) * 4 + 21)  # Ensure v is at least 1
+    print(f"Nearest QR Grid Size: {nearest_size}")
+    return estimated_size, nearest_size
 
 def compute_block_size(image_width, image_height, grid_size):
     """
@@ -140,25 +144,27 @@ def compute_block_size(image_width, image_height, grid_size):
 def main():
 
 
-    image_path = 'D:\Facultate\ASC\QRCode-Interpreter\cs_unibuc.png'
+    image_path = sys.argv[1]
     image = Image.open(image_path).convert('L')
 
     img = np.array(image)
 
     binarr = np.where(img > 128, 0, 1).astype(np.uint8)
 
+    '''
     with open('binary1_file.out', "w") as g:
         for row in binarr:
             line = ' '.join(map(str, row))
             g.write(line + '\n')
+    '''
 
     np.set_printoptions(threshold=np.inf)
 
     binarr = trim_zeros(binarr)
-    grid_size = estimate_qr_size(image_path)
+    grid_size,nearest = estimate_qr_size(image_path)
 
     image_height, image_width = binarr.shape
-    block_size = compute_block_size(image_width, image_height, grid_size)
+    block_size = compute_block_size(image_width, image_height, nearest)
 
     # Ensure block_size is at least 1 to prevent division by zero
     block_size = max(1, block_size)
@@ -169,7 +175,6 @@ def main():
     
     # Initialize the reduced array
     compressed_arr = np.zeros((new_height, new_width), dtype=int)
-
 
 
     # Process each 8x8 block
@@ -187,13 +192,14 @@ def main():
             line = ' '.join(map(str, row))
             g.write(line + '\n')
 
+
     np.set_printoptions(threshold=1000)
 
     binarr = add_white_border(binarr, block_size)
     binimg_array = (1 - binarr) * 255
     binimg = Image.fromarray(binimg_array.astype(np.uint8))
 
-    temp_path = 'D:\Facultate\ASC\QRCode-Interpreter\emp_binary.png'
+    temp_path = os.getcwd() + '/emp_binary.png'
     binimg.save(temp_path)
 
 
