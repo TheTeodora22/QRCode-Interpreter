@@ -2,7 +2,7 @@ import unicode_analyze as ua
 import data_segment as ds
 import version_check as vc
 
-def concatenate(input_text):
+def concatenate(input_text,ecl):
     modes = ua.analyze_encodings(input_text)
     unicode = (ua.print_encodable_modes(modes))
 
@@ -41,7 +41,7 @@ def concatenate(input_text):
     elif unicode == "1000":
         text_mode = 'kanji'
 
-    versiune,size = vc.version_check(input_text)
+    versiune,size = vc.version_check(input_text,ecl)
     size = int(size)
     size = size*8
     count = str(bin(len(input_text)))[2:]
@@ -55,14 +55,12 @@ def concatenate(input_text):
 
     added_zeros = qr_character_count_bits[text_mode][nice_ver] - len(count)
 
+
     added_zeros = '0'*added_zeros
 
     count = added_zeros + count
 
-
-
     data = "".join(ds.string_to_binary(input_text, text_mode))
-
 
     terminator = min(4, size-len(data)-len(count)-4)
 
@@ -78,19 +76,19 @@ def concatenate(input_text):
         remainder = (len(string)) % 8
         remainder = (8 - remainder) % 8
         bitpadding = '0'*remainder
-    EC = "11101100"
+    ec = "11101100"
     eleven= "00010001"
 
     string += bitpadding
     bytepadding=""
 
 
-    print("String:", len(string), size)
+
     if len(string)+len(bytepadding) <= 0:
         bytepadding = ""
     else:
         while len(string)+len(bytepadding) <= size-8:
-            bytepadding +=EC
+            bytepadding +=ec
             if len(string) <= size-8:
                 bytepadding += eleven
 
@@ -101,11 +99,11 @@ def concatenate(input_text):
     result = split_into_pairs(string)
     
     def string_to_hex_list(s):
-        hex_list = [hex(int(string[i:i+8], 2)) for i in range(0, len(s), 8)]  # Convert each character to hex
+        hex_list = [hex(int(s[i:i+8], 2)) for i in range(0, len(s), 8)]  # Convert each character to hex
         print("Hex List:", hex_list)
         return hex_list
 
-    hex_list = string_to_hex_list(string)
+
 
     bytes_list = [int(string[i:i+8], 2) for i in range(0, len(string), 8)]
     
