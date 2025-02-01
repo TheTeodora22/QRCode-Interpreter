@@ -52,6 +52,7 @@ def string_to_binary(input_string, mode='byte'):
     else:
         raise ValueError("Unsupported mode. Choose from 'numeric', 'alphanumeric', or 'byte'.")
     
+    
     return binary_list
 def binary_count(input_string, mode='byte'):
     binary_list = string_to_binary(input_string, mode)

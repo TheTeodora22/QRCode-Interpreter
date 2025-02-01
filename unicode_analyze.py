@@ -37,13 +37,13 @@ def print_encodable_modes(modes):
     
     # Determine the best encoding mode based on priority
     if modes['Numeric']:
-        chosen_mode = 0b0001
+        chosen_mode = "0001"
     elif modes['Alphanumeric']:
-        chosen_mode = 0b0010
+        chosen_mode = "0010"
     elif modes['Byte']:
-        chosen_mode = 	0b0100
+        chosen_mode = "0100"
     elif modes['Kanji']:
-        chosen_mode = 	0b1000
+        chosen_mode = "1000"
     else:
         chosen_mode = 'None of the supported modes'
     return chosen_mode
